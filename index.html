@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas de Hotel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles/styles2.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Hotel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#inicio">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#rooms">Quartos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reserve">Reservar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="backend.html">Backend</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <h1>Bem-vindo ao Hotel seta pra esquerda e vira pra direita</h1>
+        <p>Conforto, qualidade e preços incríveis para a sua estadia.</p>
+        <a href="#rooms" class="btn btn-success mt-3">Ver Quartos</a>
+    </section>
+
+    <div class="container mt-4">
+        <!-- Lista de Quartos -->
+        <section id="rooms">
+            <h2 class="mb-3">Quartos Disponíveis</h2>
+            <div class="row" id="room-cards">
+                <!-- Os quartos serão renderizados dinamicamente aqui -->
+            </div>
+        </section>
+
+        <!-- Formulário de Reserva -->
+        <section id="reserve" class="mt-5">
+            <h2 class="mb-3">Fazer uma Reserva</h2>
+            <form id="reservation-form">
+                <div class="mb-3">
+                    <label for="room" class="form-label">Quarto Selecionado</label>
+                    <input type="text" class="form-control" id="room" placeholder="Escolha um quarto" readonly required>
+                    <input type="hidden" id="room-id">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="name" placeholder="Digite o seu nome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Digite o seu email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Data de Check-in</label>
+                    <input type="date" class="form-control" id="date" required>
+                </div>
+                <div class="mb-3">
+                    <label for="checkout" class="form-label">Data de Check-out</label>
+                    <input type="date" class="form-control" id="checkout" required>
+                </div>
+                <div class="mb-3">
+                    <label for="total-price" class="form-label">Preço Total</label>
+                    <input type="text" class="form-control" id="total-price" placeholder="Preço total" readonly>
+                </div>
+                <button type="submit" class="btn btn-success disabled" id="reserve-button">Reservar</button>
+                <div id="error-message" class="text-danger mt-3" style="display:none;">
+                    <p>Este quarto não está disponível para as datas selecionadas.</p>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2025 Reservas de Hotel. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Storage Manager
+        const StorageManager = {
+            getData(key) {
+                try {
+                    return JSON.parse(localStorage.getItem(key)) || [];
+                } catch (error) {
+                    console.error(`Error getting data from localStorage: ${error}`);
+                    return [];
+                }
+            },
+            saveData(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                } catch (error) {
+                    console.error(`Error saving data to localStorage: ${error}`);
+                }
+            }
+        };
+
+        // Reservation Manager
+        const ReservationManager = {
+            create(reservation) {
+                const reservations = StorageManager.getData('reservations');
+                const rooms = StorageManager.getData('rooms');
+                const tariffs = StorageManager.getData('tariffs');
+
+                // Check if the reservation is within the current year
+                const currentYear = new Date().getFullYear();
+                const checkinDate = new Date(reservation.checkin);
+                const checkoutDate = new Date(reservation.checkout);
+
+                if (checkinDate.getFullYear() !== currentYear || checkoutDate.getFullYear() !== currentYear) {
+                    alert('As reservas só podem ser feitas no ano atual.');
+                    return false;
+                }
+
+                // Check if the reservation dates are not in the past
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+                if (checkinDate < today || checkoutDate <= today) {
+                    alert('Não é possível reservar em dias que já passaram.');
+                    return false;
+                }
+
+                // Check room availability
+                const conflictingReservation = reservations.find(r =>
+                    r.roomId === reservation.roomId &&
+                    !(new Date(reservation.checkout) <= new Date(r.checkin) ||
+                        new Date(reservation.checkin) >= new Date(r.checkout))
+                );
+
+                if (conflictingReservation) {
+                    alert('Este quarto já está reservado para o período selecionado.');
+                    return false;
+                }
+
+                // Determine season
+                const season = this.determineSeason(checkinDate);
+
+                // Find room and apply appropriate pricing
+                const room = rooms.find(r => r.id === parseInt(reservation.roomId));
+                const seasonalTariff = tariffs.find(t =>
+                    t.category === room.type &&
+                    t.season === season
+                );
+
+                // Calculate nights and total price
+                const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+
+                // Price calculation prioritizing seasonal tariffs
+                const pricePerNight = seasonalTariff ? parseFloat(seasonalTariff.price) : parseFloat(room.price);
+
+                reservation.id = Date.now();
+                reservation.totalPrice = nights * pricePerNight;
+                reservation.nights = nights;
+                reservation.season = season;
+
+                reservations.push(reservation);
+                StorageManager.saveData('reservations', reservations);
+                return reservation;
+            },
+
+            determineSeason(date) {
+                const month = date.getMonth();
+                const day = date.getDate();
+
+                // Holiday checks
+                const isEaster = this.isEasterPeriod(date);
+                const isChristmas = this.isChristmasPeriod(date);
+                const isSummer = month >= 6 && month <= 8; // June to August
+
+                if (isChristmas || isEaster) {
+                    return 'Alta';
+                }
+
+                if (isSummer) {
+                    return 'Alta';
+                }
+
+                // Shoulder seasons
+                if ((month >= 3 && month <= 5) || (month >= 9 && month <= 11)) {
+                    return 'Média';
+                }
+
+                return 'Baixa';
+            },
+
+            calculateEaster(year) {
+                const a = year % 19;
+                const b = Math.floor(year / 100);
+                const c = year % 100;
+                const d = Math.floor(b / 4);
+                const e = b % 4;
+                const f = Math.floor((b + 8) / 25);
+                const g = Math.floor((b - f + 1) / 3);
+                const h = (19 * a + b - d - g + 15) % 30;
+                const i = Math.floor(c / 4);
+                const k = c % 4;
+                const l = (32 + 2 * e + 2 * i - h - k) % 7;
+                const m = Math.floor((a + 11 * h + 22 * l) / 451);
+                const month = Math.floor((h + l - 7 * m + 114) / 31);
+                const day = ((h + l - 7 * m + 114) % 31) + 1;
+                return new Date(year, month - 1, day);
+            },
+
+            isEasterPeriod(date) {
+                const year = date.getFullYear();
+                const easterDate = this.calculateEaster(year);
+
+                const easterWeekStart = new Date(easterDate);
+                easterWeekStart.setDate(easterDate.getDate() - 7);
+
+                const easterWeekEnd = new Date(easterDate);
+                easterWeekEnd.setDate(easterDate.getDate() + 7);
+
+                return date >= easterWeekStart && date <= easterWeekEnd;
+            },
+
+            isChristmasPeriod(date) {
+                const year = date.getFullYear();
+                const christmasStart = new Date(year, 11, 18); // Dec 18
+                const christmasEnd = new Date(year, 11, 31);   // Dec 31
+
+                return date >= christmasStart && date <= christmasEnd;
+            },
+
+            calculateTotalPrice(roomId, checkin, checkout) {
+                const rooms = StorageManager.getData('rooms');
+                const tariffs = StorageManager.getData('tariffs');
+                const room = rooms.find(r => r.id === parseInt(roomId));
+                const checkinDate = new Date(checkin);
+                const season = this.determineSeason(checkinDate);
+                const seasonalTariff = tariffs.find(t =>
+                    t.category === room.type &&
+                    t.season === season
+                );
+
+                const checkoutDate = new Date(checkout);
+                const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+                const pricePerNight = seasonalTariff ? parseFloat(seasonalTariff.price) : parseFloat(room.price);
+
+                return nights * pricePerNight;
+            }
+        };
+
+        const RoomManager = {
+            render() {
+                const rooms = StorageManager.getData('rooms');
+                const roomCardsContainer = document.getElementById('room-cards');
+                roomCardsContainer.innerHTML = '';
+
+                rooms.forEach(room => {
+                    if (room.status === 'Disponível') {
+                        const roomCard = document.createElement('div');
+                        roomCard.classList.add('col-md-4', 'mb-4');
+                        roomCard.innerHTML = `
+                    <div class="card room-card" data-room-id="${room.id}">
+                        <img src="${room.photo}" alt="${room.type}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">${room.type}</h5>
+                            <p class="card-text">Capacidade: ${room.capacity} pessoas</p>
+                            <p class="card-text">Preço: €${parseFloat(room.price).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+                        roomCardsContainer.appendChild(roomCard);
+                    }
+                });
+
+                const roomCards = document.querySelectorAll('.room-card');
+                roomCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        roomCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+
+                        const roomId = card.getAttribute('data-room-id');
+                        const room = rooms.find(r => r.id === parseInt(roomId));
+
+                        document.getElementById('room').value = `${room.type} (${room.capacity} pessoas)`;
+                        document.getElementById('room-id').value = roomId;
+
+                        document.getElementById('reserve-button').classList.remove('disabled');
+                    });
+                });
+            }
+        };
+
+        // Page Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render rooms
+            RoomManager.render();
+
+            // Calculate total price when dates change
+            const checkinInput = document.getElementById('date');
+            const checkoutInput = document.getElementById('checkout');
+            const roomInput = document.getElementById('room-id');
+            const totalPriceInput = document.getElementById('total-price');
+
+            function updateTotalPrice() {
+                const roomId = roomInput.value;
+                const checkin = checkinInput.value;
+                const checkout = checkoutInput.value;
+
+                if (roomId && checkin && checkout) {
+                    const totalPrice = ReservationManager.calculateTotalPrice(roomId, checkin, checkout);
+                    totalPriceInput.value = `€${totalPrice.toFixed(2)}`;
+                } else {
+                    totalPriceInput.value = '';
+                }
+            }
+
+            checkinInput.addEventListener('change', updateTotalPrice);
+            checkoutInput.addEventListener('change', updateTotalPrice);
+
+            // Reservation Form Submission
+            const reservationForm = document.getElementById('reservation-form');
+            reservationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const errorMessage = document.getElementById('error-message');
+
+                const reservation = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    roomId: document.getElementById('room-id').value,
+                    checkin: document.getElementById('date').value,
+                    checkout: document.getElementById('checkout').value
+                };
+
+                const result = ReservationManager.create(reservation);
+
+                if (result) {
+                    errorMessage.style.display = 'none';
+                    totalPriceInput.value = `€${result.totalPrice.toFixed(2)}`;
+                    alert('Reserva criada com sucesso!');
+                    reservationForm.reset();
+                    document.querySelectorAll('.room-card').forEach(card => card.classList.remove('selected'));
+
+                    // Disable the reserve button again
+                    document.getElementById('reserve-button').classList.add('disabled');
+                } else {
+                    errorMessage.style.display = 'block';
+                    totalPriceInput.value = '';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

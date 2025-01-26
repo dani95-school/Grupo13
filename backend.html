@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Hotel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Administração do Hotel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#rooms">Quartos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reservations">Reservas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tariffs">Tarifas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html">Front</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Rooms Section -->
+        <section id="rooms">
+            <h2>Gestão de Quartos</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#roomModal">Adicionar
+                        Quarto</button>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Capacidade</th>
+                                <th>Preço Base</th>
+                                <th>Status</th>
+                                <th>Imagem</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="room-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reservations Section -->
+        <section id="reservations" class="mt-5">
+            <h2>Gestão de Reservas</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal"
+                        data-bs-target="#reservationModal">Adicionar Reserva</button>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Quarto</th>
+                                <th>Datas</th>
+                                <th>Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservation-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tariffs Section -->
+        <section id="tariffs" class="mt-5">
+            <h2>Gestão de Tarifas</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#tariffModal">Adicionar
+                        Tarifa</button>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Descrição</th>
+                                <th>Preço</th>
+                                <th>Época</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tariff-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Room Modal -->
+    <div class="modal fade" id="roomModal" tabindex="-1" aria-labelledby="roomModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomModalLabel">Adicionar/Editar Quarto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="room-form">
+                        <input type="hidden" id="room-id">
+                        <div class="mb-3">
+                            <label for="room-type" class="form-label">Tipo de Quarto</label>
+                            <select id="room-type" class="form-select" required>
+                                <option value="Normal">Normal</option>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Suíte">Suíte</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="room-capacity" class="form-label">Capacidade</label>
+                            <input type="number" id="room-capacity" class="form-control" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="room-price" class="form-label">Preço Base</label>
+                            <input type="number" id="room-price" class="form-control" min="0" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="room-status" class="form-label">Status</label>
+                            <select id="room-status" class="form-select" required>
+                                <option value="Disponível">Disponível</option>
+                                <option value="Ocupado">Ocupado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="room-photo">URL da Foto:</label>
+                            <input type="text" id="room-photo" class="form-control" placeholder="Insira o URL da foto">
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRoom()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationModalLabel">Adicionar/Editar Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reservation-form">
+                        <input type="hidden" id="reservation-id">
+                        <div class="mb-3">
+                            <label for="reservation-name" class="form-label">Nome do Cliente</label>
+                            <input type="text" id="reservation-name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reservation-email" class="form-label">Email do Cliente</label>
+                            <input type="email" id="reservation-email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reservation-room" class="form-label">Quarto</label>
+                            <select id="reservation-room" class="form-select" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reservation-checkin" class="form-label">Data de Entrada</label>
+                            <input type="date" id="reservation-checkin" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reservation-checkout" class="form-label">Data de Saída</label>
+                            <input type="date" id="reservation-checkout" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveReservation()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tariff Modal -->
+    <div class="modal fade" id="tariffModal" tabindex="-1" aria-labelledby="tariffModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tariffModalLabel">Adicionar/Editar Tarifa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tariff-form">
+                        <input type="hidden" id="tariff-id">
+                        <div class="mb-3">
+                            <label for="tariff-category" class="form-label">Categoria</label>
+                            <select id="tariff-category" class="form-select" required>
+                                <option value="Normal">Normal</option>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Suíte">Suíte</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tariff-description" class="form-label">Descrição</label>
+                            <textarea id="tariff-description" class="form-control" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tariff-price" class="form-label">Preço</label>
+                            <input type="number" id="tariff-price" class="form-control" min="0" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tariff-season" class="form-label">Época</label>
+                            <select id="tariff-season" class="form-select" required>
+                                <option value="Baixa">Época Baixa</option>
+                                <option value="Média">Época Média</option>
+                                <option value="Alta">Época Alta</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTariff()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <!-- Summaries Section -->
+        <section id="summaries" class="row">
+            <!-- Room Summary -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Resumo de Quartos</div>
+                    <div class="card-body">
+                        <p>Total de Quartos: <span id="total-rooms">0</span></p>
+                        <p>Quartos Disponíveis: <span id="available-rooms">0</span></p>
+                        <p>Quartos Ocupados: <span id="occupied-rooms">0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservation Summary -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Resumo de Reservas</div>
+                    <div class="card-body">
+                        <p>Total de Reservas: <span id="total-reservations">0</span></p>
+                        <p>Receita Total: <span id="total-revenue">€0.00</span></p>
+                        <p>Receita Esperada no Mês Atual: <span id="expected-monthly-revenue">€0.00</span></p>
+                        <p>Receita Esperada no Ano Atual: <span id="expected-annual-revenue">€0.00</span></p>
+                        <p>Total de Dias Reservados: <span id="total-reserved-days">0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tariff Summary -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Resumo de Tarifas</div>
+                    <div class="card-body">
+                        <p>Total de Tarifas: <span id="total-tariffs">0</span></p>
+                        <p>Tarifa Média: <span id="average-tariff">€0.00</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/storageManager.js"></script>
+    <script src="scripts/roomManager.js"></script>
+    <script src="scripts/reservationManager.js"></script>
+    <script src="scripts/tariffManager.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script>
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            RoomManager.render();
+            RoomManager.populateRoomSelect();
+            ReservationManager.render();
+            TariffManager.render();
+        });
+    </script>
+</body>
+
+</html>
