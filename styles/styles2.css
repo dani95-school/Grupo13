@@ -1,0 +1,124 @@
+/* Hero Section */
+.hero {
+    position: relative;
+    background-image: url('https://placehold.co/1920x1080');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-top: 10px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+}
+
+.hero .btn {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    background-color: #0056b3;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.hero .btn:hover {
+    background-color: #004494;
+}
+
+/* Room Selection */
+.room-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    border-radius: 8px;
+}
+
+.room-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.room-card.selected {
+    border: 3px solid green;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 128, 0, 0.3);
+}
+
+.room-card.selected::after {
+    content: "Selecionado";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Ajustes para o Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Botões gerais */
+.btn {
+    border-radius: 20px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #004494;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Formulários */
+form {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+form .form-label {
+    font-weight: bold;
+}
+
+form .form-control {
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
